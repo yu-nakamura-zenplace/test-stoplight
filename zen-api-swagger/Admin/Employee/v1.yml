@@ -392,3 +392,8 @@ components:
               password:
                 type: string
       description: user_login_id と パスワードで認証する時のリクエストBody
+  securitySchemes:
+    '{API Key}':
+      type: apiKey
+      in: header
+      name: AdminAPIへのアクセスキー
