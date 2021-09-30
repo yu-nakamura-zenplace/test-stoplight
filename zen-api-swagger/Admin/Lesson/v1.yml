@@ -254,3 +254,9 @@ components:
           - staff
         example: member
       description: 予約件数を集計する際のグルーピング
+  securitySchemes:
+    X-API-Key:
+      type: apiKey
+      in: header
+      description: ''
+      name: AdminAPIへのアクセスキー
