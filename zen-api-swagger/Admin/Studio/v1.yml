@@ -30,6 +30,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Studio'
+      security:
+        - API Key Auth: []
     parameters: []
 components:
   schemas:
@@ -87,3 +89,8 @@ components:
       schema:
         type: integer
       description: １ページあたりの表示件数
+  securitySchemes:
+    API Key Auth:
+      name: X-API-Key
+      type: apiKey
+      in: header
