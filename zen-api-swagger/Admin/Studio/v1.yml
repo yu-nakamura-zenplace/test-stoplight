@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  description: スタジオ情報PF
+  version: 1.0.0
+  title: StudioPF Admin API
+servers:
+  - url: 'https:///admin-staging-api.zenplace.co.jp/studio/v1'
+    description: Staging server
+  - url: 'https:///admin-api.zenplace.co.jp/studio/v1'
+    description: Production server
+paths:
+  /studios/available:
+    get:
+      tags:
+        - studios
+      summary: スタジオ一覧取得
+      description: ブランドを指定してスタジオ一覧を返却
+      parameters:
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: ./Lesson.yaml#/components/parameters/is_presence
+        - $ref: ./we-mobile-bff.yaml#/components/parameters/page
+        - $ref: ./we-mobile-bff.yaml#/components/parameters/per_page
+      responses:
+        '200':
+          description: スタジオ一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Studio'
+    parameters: []
+components:
+  schemas:
+    Studio:
+      title: スタジオ情報
+      description: スタジオオブジェクト
+      type: object
+      properties:
+        studio_id:
+          type: integer
+          description: スタジオID
+        brand_id:
+          type: integer
+          description: ブランドID
+        studio_name:
+          type: string
+          description: スタジオ名
+  parameters:
+    brand_id:
+      name: brand_id
+      in: path
+      description: ブランドID
+      required: true
+      schema:
+        type: integer
+    fields:
+      name: fields
+      in: query
+      description: '返却するフィールドをカンマ区切りで指定,指定しなければすべて返却'
+      required: false
+      example: 'user_id,staff_name,staff_image'
+      schema:
+        type: string
+        example: 'studio_name,brand_id'
+    sort:
+      name: sort
+      in: query
+      description: 並び替え
+      required: false
+      example: '-insert_date,staff_name(insert_date降順、スタッフ名昇順)'
+      schema:
+        type: string
+        example: insert_date
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: ページ数
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: １ページあたりの表示件数

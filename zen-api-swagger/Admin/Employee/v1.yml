@@ -1,0 +1,394 @@
+openapi: 3.0.0
+info:
+  description: 社員情報PF
+  version: 1.0.0
+  title: EnployeePF Admin API
+servers:
+  - url: 'https:///admin-staging-api.zenplace.co.jp/employee/v1'
+    description: Staging server
+  - url: 'https:///admin-api.zenplace.co.jp/employee/v1'
+    description: Production server
+paths:
+  /staffs:
+    get:
+      tags:
+        - staffs
+      summary: スタッフ一覧取得
+      description: スタッフ一覧を返却
+      parameters:
+        - $ref: '#/components/parameters/job_type'
+        - $ref: '#/components/parameters/studio_id'
+        - $ref: '#/components/parameters/staff_ids'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/page_per'
+      responses:
+        '200':
+          description: スタッフ一覧を返却
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+  /auth/login:
+    post:
+      summary: ログイン認証
+      operationId: post-auth-login
+      responses:
+        '200':
+          description: ID/PASS認証が成功したらJWTトークンを返す
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                      refresh_token:
+                        type: string
+        '401':
+          description: ID/PASS認証に失敗したら
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        minLength: 1
+                      type:
+                        type: string
+                        minLength: 1
+                      code:
+                        type: string
+                        minLength: 1
+                    required:
+                      - message
+                      - type
+                      - code
+                required:
+                  - error
+                x-examples:
+                  example-1:
+                    error:
+                      message: Incorrect email address or password.
+                      type: App\Exceptions\LoginErrorException
+                      code: login_error
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        minLength: 1
+                      type:
+                        type: string
+                        minLength: 1
+                      code:
+                        type: string
+                        minLength: 1
+                    required:
+                      - message
+                      - type
+                      - code
+                required:
+                  - error
+                x-examples:
+                  example-1:
+                    error:
+                      message: Incorrect email address or password.
+                      type: App\Exceptions\LoginErrorException
+                      code: login_error
+      requestBody:
+        $ref: '#/components/requestBodies/login'
+      description: ID/PASS認証が成功したらJWTトークン（アクセストークン/リフレッシュトークン）を返す
+      parameters: []
+  /auth/refresh:
+    post:
+      summary: ログイン認証情報再取得
+      operationId: post-auth-refresh
+      responses:
+        '200':
+          description: アクセストークンとリフレッシュトークンを返す
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                      refresh_token:
+                        type: string
+        '401':
+          description: JWT有効期限切れの場合
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        minLength: 1
+                      type:
+                        type: string
+                        minLength: 1
+                      code:
+                        type: string
+                        minLength: 1
+                    required:
+                      - message
+                      - type
+                      - code
+                required:
+                  - error
+                x-examples:
+                  example-1:
+                    error:
+                      message: Incorrect email address or password.
+                      type: App\Exceptions\LoginErrorException
+                      code: login_error
+      description: JWTアクセストークンの有効期限が切れて、リフレッシュトークンが有効ならID/PASS不要で再取得できる
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization: bearer '
+          description: '{JWTトークン}'
+    parameters: []
+  /my/profile:
+    get:
+      summary: ログインユーザー情報を取得
+      description: ログインしたスタッフの情報を取得
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization: bearer <JWTトークン>'
+          description: JWTトークン
+        - schema:
+            type: string
+          in: header
+          name: x-api-key
+          description: APIキー
+      responses:
+        '200':
+          description: ログインしたスタッフの情報を取得
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        minLength: 1
+                      type:
+                        type: string
+                        minLength: 1
+                      code:
+                        type: string
+                        minLength: 1
+                    required:
+                      - message
+                      - type
+                      - code
+                required:
+                  - error
+      operationId: get-my-profile
+    parameters: []
+components:
+  schemas:
+    Staff:
+      title: 社員情報
+      description: スタッフオブジェクト
+      type: object
+      x-examples:
+        example-1:
+          user_id: 10001
+          login_id: '10001'
+          job_type: 103
+          staff_studio: 85
+          staff_name: name
+          profile_image_url: null
+      properties:
+        staff_id:
+          type: integer
+          description: staff_id
+        login_id:
+          description: 社員のログインID
+          type: string
+        job_type:
+          type: integer
+          description: 社員の職種
+        staff_studio:
+          type: integer
+          description: 所属スタジオ
+        staff_name:
+          type: string
+          description: スタッフ名
+        profile_image_url:
+          type: string
+          description: スタッフのプロフィール画像
+    BaseHeaderResponse:
+      title: BaseHeaderResponse
+      type: object
+      properties:
+        Link:
+          type: string
+          example: 'https://api.zenplace.co.jp/employee/v1/staffs?page=3&per_page=100; rel="next", https://api.zenplace.co.jp/employee/v1/staffs?page=2&per_page=100; rel="prev", https://api.zenplace.co.jp/employee/v1/staffs?page=1&per_page=100; rel="first", https://api.zenplace.co.jp/employee/v1/staffs?page=50&per_page=100; rel="last",'
+        X-Total-Count:
+          type: integer
+  parameters:
+    job_type:
+      name: job_group
+      in: query
+      description: 社員の職種
+      required: false
+      schema:
+        type: string
+        enum:
+          - we
+          - headquarters
+    studio_id:
+      name: studio_id
+      in: query
+      description: 所属スタジオ
+      required: false
+      schema:
+        type: integer
+    staff_ids:
+      name: staff_ids
+      in: query
+      description: user_idのリストからスタッフリストを取得
+      required: false
+      example: '100000,100001,100002'
+      schema:
+        type: string
+    fields:
+      name: fields
+      in: query
+      description: '返却するフィールドをカンマ区切りで指定,指定しなければすべて返却'
+      required: false
+      example: 'user_id,staff_name,staff_image'
+      schema:
+        type: string
+    sort:
+      name: sort
+      in: query
+      description: 並び替え
+      required: false
+      example: '-insert_date,staff_name(insert_date降順、スタッフ名昇順)'
+      schema:
+        type: string
+    Link:
+      name: Link
+      in: header
+      required: false
+      schema:
+        type: string
+        example: 'https://api.zenplace.co.jp/employee/v1/staffs?page=3&per_page=100; rel="next", https://api.zenplace.co.jp/employee/v1/staffs?page=2&per_page=100; rel="prev", https://api.zenplace.co.jp/employee/v1/staffs?page=1&per_page=100; rel="first", https://api.zenplace.co.jp/employee/v1/staffs?page=50&per_page=100; rel="last",'
+      description: ページング用
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: ページ数
+    page_per:
+      name: page_per
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: 1ページあたりの表示件数
+  responses:
+    ResponseHeader:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
+      headers:
+        header-0:
+          schema:
+            type: string
+  requestBodies:
+    login:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              login_id:
+                type: string
+              password:
+                type: string
+      description: user_login_id と パスワードで認証する時のリクエストBody

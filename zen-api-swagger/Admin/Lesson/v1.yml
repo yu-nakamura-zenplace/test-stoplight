@@ -1,0 +1,256 @@
+openapi: 3.0.0
+info:
+  description: レッスン情報
+  version: 1.0.0
+  title: LessonPF Admin API
+servers:
+  - url: 'https:///admin-staging-api.zenplace.co.jp/lesson/v1'
+    description: Staging server
+  - url: 'https:///admin-api.zenplace.co.jp/lesson/v1'
+    description: Production server
+paths:
+  /schedules:
+    get:
+      tags:
+        - schedules
+      summary: 対象スタジオのレッスン一覧を取得
+      description: レッスン日、スタジオIDからレッスン一覧を取得。出席するユーザーIDのリストもキャストして返却
+      parameters:
+        - $ref: '#/components/parameters/studio_id'
+        - $ref: '#/components/parameters/lesson_date'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: ./Employee.yaml#/components/parameters/page
+        - $ref: ./Employee.yaml#/components/parameters/page_per
+      responses:
+        '200':
+          description: 入会３ヶ月以内の会員一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+  '/reservations/counts/{reservation_count_group}':
+    get:
+      tags:
+        - reservations
+      summary: レッスンの予約件数を取得
+      description: レッスンの予約件数を取得できる.ワイルドカードの部分によってグルーピングの仕方を分け。
+      parameters:
+        - $ref: '#/components/parameters/user_ids'
+        - $ref: '#/components/parameters/is_presence'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: ./Employee.yaml#/components/parameters/page
+        - $ref: ./Employee.yaml#/components/parameters/page_per
+        - $ref: ./we-mobile-bff.yaml#/components/parameters/studio_id_in_query
+      responses:
+        '200':
+          description: レッスンの予約情報を取得
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReserveNum'
+          headers: {}
+    parameters:
+      - name: reservation_count_group
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+            - member
+            - studio
+            - staff
+          example: member
+        description: 予約件数を集計する際のグルーピング
+components:
+  schemas:
+    Schedule:
+      title: レッスンスケジュール
+      description: レッスンスケジュールオブジェクト
+      type: object
+      properties:
+        id:
+          type: integer
+          description: プライマリーキー
+        studio_id:
+          type: integer
+          description: スタジオID
+        class_name:
+          type: string
+          description: レッスン名
+        lesson_date:
+          type: string
+          description: レッスン開催日
+        start_time:
+          type: string
+          description: 開始時刻
+        end_time:
+          type: string
+          description: 終了時刻
+        staff_id:
+          description: 担当スタッフID
+          type: string
+        staff_id2:
+          type: string
+          description: 担当スタッフID2
+        class_type:
+          type: string
+          enum:
+            - PV
+            - GL
+          description: '(101:PV 102:GL)'
+        reserved_user_ids:
+          type: array
+          description: 予約済みユーザーID一覧
+          example:
+            - 10000
+            - 100001
+            - 100002
+            - 100003
+          items: {}
+      x-examples:
+        example-1:
+          id: 0
+          studio_id: 0
+          class_name: string
+          lesson_date: string
+          start_time: string
+          end_time: string
+          staff_id: string
+          staff_id2: string
+          class_type: PV
+          reserved_user_ids:
+            - '10000'
+            - '100001'
+            - '100002'
+            - '100003'
+    ReserveNum:
+      title: レッスンスケジュール
+      description: レッスンスケジュールオブジェクト
+      type: object
+      properties:
+        gl_count:
+          type: integer
+          description: グループレッスン数
+        pv_count:
+          type: integer
+          description: プライペートレッスン数
+        user_id:
+          type: string
+  parameters:
+    studio_id:
+      name: studio_id
+      in: query
+      description: スタジオIDを指定
+      required: false
+      example: 1
+      schema:
+        type: integer
+    user_ids:
+      name: user_ids
+      in: query
+      required: false
+      description: クライアントユーザーIDリスト
+      schema:
+        type: string
+        example: '"10000,100001,100002"'
+    is_presence:
+      name: is_presence
+      in: query
+      required: false
+      description: 出席したレッスンかどうか
+      example: 1
+      schema:
+        type: integer
+        enum:
+          - 0
+          - 1
+    lesson_date:
+      name: lesson_date
+      in: query
+      required: false
+      description: レッスン開催日
+      example: '2021-09-01'
+      schema:
+        type: string
+    fields:
+      name: fields
+      in: query
+      description: '返却するフィールドをカンマ区切りで指定,指定しなければすべて返却'
+      required: false
+      example: 'lesson_date,class_name'
+      schema:
+        type: string
+        example: 'class_name,lesson_date'
+    sort:
+      name: sort
+      in: query
+      description: 並び替え
+      required: false
+      example: '-lesson_date,start_time(lesson_date降順,start_time昇順)'
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: ページ
+    page_per:
+      name: page_per
+      in: query
+      required: false
+      schema:
+        type: string
+      description: 1ページあたりの表示件数
+    reservation_count_group:
+      name: reservation_count_group
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - member
+          - studio
+          - staff
+        example: member
+      description: 予約件数を集計する際のグルーピング

@@ -1,0 +1,1008 @@
+openapi: 3.0.0
+info:
+  description: We Mobile BFF
+  version: 1.0.0
+  title: We Mobile BFF API
+servers:
+  - url: 'https://bff-api-staging.zenplace.co.jp/we-mobile/v1'
+    description: Staging server
+  - url: 'https://bff-api.zenplace.co.jp/we-mobile/v1'
+    description: Production server
+paths:
+  /users/new_member:
+    get:
+      tags:
+        - users
+      summary: 入会３ヶ月以内のユーザーを取得
+      description: 入会３ヶ月以内のユーザー一覧を取得
+      parameters:
+        - $ref: '#/components/parameters/user_ids'
+        - $ref: '#/components/parameters/studio_id_in_query'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        '200':
+          description: 入会３ヶ月以内の会員一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+  '/studios/{studio_id}/comming_new_member':
+    get:
+      tags:
+        - /comming_new_member
+      summary: 選択した日付に来店してくる入会3ヶ月未満のクライアント
+      description: 選択した日付に来店してくる入会3ヶ月未満のクライアント
+      parameters:
+        - $ref: '#/components/parameters/studio_id_in_path'
+        - $ref: '#/components/parameters/lesson_date'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        '200':
+          description: 入会３ヶ月以内の会員一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+  /process_master:
+    get:
+      tags:
+        - process_master
+      summary: プロセスリストを取得
+      description: プロセスリストをマスターから取得
+      parameters:
+        - $ref: '#/components/parameters/is_display'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          description: プロセスリストをマスターから取得
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessMaster'
+  /process_actioins:
+    get:
+      tags:
+        - process_action
+      summary: プロセスアクションリストを取得
+      description: ユーザーリストごとにプロセスアクションリストを取得
+      parameters:
+        - $ref: '#/components/parameters/user_ids'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        '200':
+          description: 会員一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    process_actions:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProcessActions'
+                    client_memos:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Climemo'
+                    client_info:
+                      $ref: '#/components/schemas/ClientInfo'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+    post:
+      tags:
+        - process
+      summary: プロセスアクションリストを新規追加
+      description: プロセスアクションリストを新規追加
+      requestBody:
+        $ref: '#/components/requestBodies/ProcessActionsBody'
+      responses:
+        '200':
+          description: 新規追加成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessActions'
+  '/process_actions/{process_action_id}':
+    delete:
+      tags:
+        - process
+      summary: プロセスアクション取り消し
+      description: プロセスアクション取り消し
+      parameters:
+        - $ref: '#/components/parameters/process_action_id'
+      responses:
+        '200':
+          description: 削除成功
+  /client_memos:
+    post:
+      tags:
+        - client_memo
+      summary: クライアントメモ新規作成
+      description: クライアントメモ新規作成
+      responses:
+        '200':
+          description: 新規作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Climemo'
+      requestBody:
+        $ref: '#/components/requestBodies/ClimemoBody'
+    parameters: []
+  '/client_memos/{client_memo_id}':
+    put:
+      tags:
+        - client_memo
+      summary: クライアントメモ編集
+      description: クライアントメモ編集
+      parameters:
+        - $ref: '#/components/parameters/client_memo_id'
+      responses:
+        '200':
+          description: 編集作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Climemo'
+      requestBody:
+        $ref: '#/components/requestBodies/ClimemoBody'
+    delete:
+      tags:
+        - client_memo
+      summary: クライアントメモ編集
+      description: クライアントメモ編集
+      parameters:
+        - $ref: '#/components/parameters/client_memo_id'
+      responses:
+        '200':
+          description: 削除成功
+    parameters:
+      - schema:
+          type: string
+        name: client_memo_id
+        in: path
+        required: true
+  /client_info:
+    post:
+      tags:
+        - client_info
+      summary: 6項目の情報を新規作成
+      description: 6項目の情報を新規作成
+      responses:
+        '200':
+          description: 新規追加成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientInfo'
+      requestBody:
+        $ref: '#/components/requestBodies/ClientInfoBody'
+  /member_achievements:
+    get:
+      tags:
+        - member_achievement
+      summary: 会員の過去の実績を取得
+      description: 会員の過去の実績を取得
+      parameters:
+        - $ref: '#/components/parameters/user_ids'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        '200':
+          description: 会員の過去の実績を取得
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MemberAchievement'
+  /staffs:
+    get:
+      tags:
+        - staffs
+      summary: スタッフ一覧取得
+      description: スタッフ一覧を返却
+      parameters:
+        - $ref: '#/components/parameters/job_type'
+        - $ref: '#/components/parameters/studio_id_in_query'
+        - $ref: '#/components/parameters/staff_ids'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        '200':
+          description: スタッフ一覧を返却
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+  /studios/available:
+    get:
+      tags:
+        - studios
+      summary: スタジオ一覧取得
+      description: ブランドを指定してスタジオ一覧を返却
+      parameters:
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          description: スタジオ一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Studio'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+    parameters: []
+  '/brand/{brand_id}/studios':
+    get:
+      tags:
+        - studios
+      summary: スタジオ一覧取得
+      description: ブランドを指定してスタジオ一覧を返却
+      parameters:
+        - $ref: '#/components/parameters/brand_id'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          description: スタジオ一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Studio'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+  '/studios/{studio_id}/schedules':
+    get:
+      tags:
+        - users
+      summary: 対象スタジオのレッスン一覧を取得
+      description: レッスン日、スタジオIDからレッスン一覧を取得。出席するユーザーIDのリストもキャストして返却
+      parameters:
+        - $ref: '#/components/parameters/studio_id_in_path'
+        - $ref: '#/components/parameters/lesson_date'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        '200':
+          description: 入会３ヶ月以内の会員一覧を返却
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+          headers:
+            Link:
+              schema:
+                type: string
+              description: 'next,prev,first,end'
+            X-Total-Count:
+              schema:
+                type: string
+              description: トータル件数
+            X-Per-Page:
+              description: 1ページあたりの件数
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: 全ページ数
+            X-Current-Page:
+              schema:
+                type: integer
+              description: 現在のページ
+            X-Next-Page:
+              schema:
+                type: integer
+              description: 次のページ
+            X-Prev-Page:
+              schema:
+                type: integer
+              description: 前のページ
+            X-Last-Page:
+              schema:
+                type: integer
+              description: 最後のページ
+  /my/profile:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+      operationId: get-my-profile
+components:
+  schemas:
+    Studio:
+      title: スタジオ情報
+      description: スタジオオブジェクト
+      type: object
+      properties:
+        studio_id:
+          type: integer
+          description: スタジオID
+        brand_id:
+          type: integer
+          description: ブランドID
+        studio_name:
+          type: string
+          description: スタジオ名
+    Staff:
+      title: 社員情報
+      description: スタッフオブジェクト
+      type: object
+      properties:
+        staff_id:
+          type: integer
+          description: staff_id
+        login_id:
+          type: integer
+          description: 社員のログインID
+        job_type:
+          type: integer
+          description: 社員の職種
+        staff_studio:
+          type: integer
+          description: 所属スタジオ
+        staff_name:
+          type: string
+          description: スタッフ名
+        profile_image_path:
+          type: string
+          description: スタッフのプロフィール画像
+    Schedule:
+      title: 選択日にスタジオに来店する入会３ヶ月以内会員さま
+      description: 選択日にスタジオに来店する入会３ヶ月以内会員さまスケジュールごとにソートした
+      type: object
+      properties:
+        schedule_id:
+          type: integer
+          description: スケジュールID
+        class_type:
+          type: integer
+          description: '(101:PV|102:GL)'
+        class_name:
+          type: string
+          description: クラス名
+        lesson_date:
+          type: string
+          description: 開催日
+        start_date:
+          type: string
+          description: 開始時刻
+        end_date:
+          type: string
+          description: 終了時刻
+        is_studio_online:
+          type: integer
+          description: (0|1)
+        reserved_users:
+          type: array
+          items:
+            type: string
+        staff_id:
+          type: string
+    User:
+      title: 会員情報
+      description: 会員情報オブジェクト
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: 会員ID
+          example: '10000'
+        member_name:
+          type: string
+          description: 会員名
+        profile_image_url:
+          type: string
+          description: プロフィール画像
+          example: 'https://example.com/photo1.png'
+        join_status:
+          type: string
+          enum:
+            - today
+            - twoWeekAgo
+            - oneMonthAgo
+            - twoMonthAgo
+            - threeMonthAgo
+            - tooPast
+          description: 入会後ステータス
+          example: today
+        nyukai_date:
+          type: string
+          description: 入会日
+        user_login_id:
+          type: string
+          description: 会員ログインID
+    LoginUser:
+      title: ログインユーザー情報
+      description: ログインユーザーオブジェクト
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: ユーザーID
+          example: 10000
+        nick_name:
+          type: string
+          description: ニックネーム
+          example: ピラティス太郎
+        studio_id:
+          type: integer
+          description: スタジオID
+          example: 1
+        profile_image_url:
+          type: string
+          description: プロフィールURL
+    ProcessMaster:
+      title: プロセスアクションリスト
+      description: プロセスアクションリストマスター
+      type: object
+      properties:
+        id:
+          type: integer
+          description: プロセスアクションマスターID
+          example: 10000
+        process_title:
+          type: string
+          description: プロセスアクションのタイトル
+          example: 紹介促進
+        process_action_timing:
+          type: string
+          enum:
+            - today
+            - twoWeekAgo
+            - oneMonthAgo
+            - twoMonthAgo
+            - threeMonthAgo
+            - tooPast
+          description: プロセスアクション実行タイミング
+          example: today
+    ProcessActions:
+      title: プロセスアクション
+      description: プロセスアクションオブジェクト
+      type: object
+      properties:
+        id:
+          type: integer
+          description: プライマリーキー
+        process_master:
+          type: object
+          properties:
+            process_master_id:
+              type: integer
+              description: プロセスアクションマスターID
+              example: 10000
+            process_title:
+              type: string
+              description: プロセスアクションのタイトル
+              example: 紹介促進
+            process_action_timing:
+              type: string
+              enum:
+                - today
+                - twoWeekAgo
+                - oneMonthAgo
+                - twoMonthAgo
+                - threeMonthAgo
+                - tooPast
+              description: プロセスアクション実行タイミング
+              example: today
+        action_date:
+          type: string
+          description: アクション実施日
+        user_id:
+          type: integer
+          description: アクション対象の会員のID
+        action_staff_id:
+          type: integer
+          description: アクション実施スタッフ
+    Climemo:
+      title: クライアントメモ
+      description: クライアントメモオブジェクト
+      type: object
+      properties:
+        id:
+          type: integer
+          description: プライマリーキー
+        memo:
+          type: string
+          description: クライアントメモ
+        memo_date:
+          type: string
+          description: 記載日
+        memo_type:
+          type: string
+          description: 'メモタイプ (コード:基本情報)'
+          example: basic
+          enum:
+            - basic
+        is_mobile:
+          type: integer
+          description: モバイルアプリから投稿したものかどうかを表すフラグ
+          enum:
+            - 0
+            - 1
+        user_id:
+          type: string
+        staff_id:
+          type: string
+    ClientInfo:
+      title: 新６項目
+      description: 新６項目オブジェクト
+      type: object
+      properties:
+        id:
+          type: integer
+          description: プライマリーキー
+        nick_name:
+          type: string
+          description: ニックネーム
+        pref:
+          type: integer
+          description: 出身都道府県コード
+        birthplace:
+          type: string
+          description: 出身地域
+        family:
+          type: string
+          description: 家族
+        work:
+          type: string
+          description: お仕事
+        hobby:
+          type: string
+          description: 趣味
+        sports:
+          type: string
+          description: スポーツ
+        staff_id:
+          type: string
+          description: ６項目を入力したスタッフのID
+        user_id:
+          type: string
+          description: 情報を入力さ
+        is_mobile:
+          type: integer
+          description: モバイルアプリからの入力かどうかのフラグ
+    MemberAchievement:
+      title: ユーザーごとの実績
+      description: プロセスアクションリストマスター
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: ユーザーID
+          example: 10000
+        gl_presence_count:
+          type: integer
+          description: 月GL受講回数
+          example: 3
+        client_info_rate:
+          type: integer
+          description: ６項目入力割合
+          example: 80
+        pv_presence_count:
+          type: integer
+          description: 月PV受講回数
+        introduction_count:
+          type: integer
+          description: 紹介者人数
+  parameters:
+    brand_id:
+      name: brand_id
+      in: path
+      description: ブランドID
+      required: true
+      schema:
+        type: integer
+    studio_id_in_path:
+      name: studio_id
+      in: path
+      description: 所属スタジオ
+      required: true
+      schema:
+        type: integer
+    studio_id_in_query:
+      name: studio_id
+      in: query
+      description: 所属スタジオ
+      required: false
+      schema:
+        type: integer
+    staff_ids:
+      name: staff_ids
+      in: query
+      description: user_idのリストからスタッフリストを取得
+      required: false
+      example: '100000,100001,100002'
+      schema:
+        type: string
+    job_type:
+      name: job_group
+      in: query
+      description: 社員の職種
+      required: false
+      schema:
+        type: string
+        enum:
+          - we
+          - headquarters
+    is_display:
+      name: is_display
+      in: query
+      description: 表示フラグが付いているもののみか？
+      required: false
+      example: 1
+      schema:
+        type: integer
+    lesson_date:
+      name: lesson_date
+      in: query
+      required: false
+      description: レッスン開催日
+      example: '2021-09-01'
+      schema:
+        type: string
+    user_ids:
+      name: user_ids
+      in: query
+      description: ユーザーIDリスト
+      required: false
+      example: '100,101,102'
+      schema:
+        type: string
+    client_memo_id:
+      name: client_memo_id
+      in: path
+      description: クライアントメモID
+      required: true
+      schema:
+        type: integer
+    process_action_id:
+      name: process_action_id
+      in: path
+      description: プロセスアクションID
+      required: true
+      schema:
+        type: integer
+    fields:
+      name: fields
+      in: query
+      description: '返却するフィールドをカンマ区切りで指定,指定しなければすべて返却'
+      required: false
+      example: 'user_id,staff_name,staff_image'
+      schema:
+        type: string
+    sort:
+      name: sort
+      in: query
+      description: 並び替え
+      required: false
+      example: '-insert_date,staff_name(insert_date降順、スタッフ名昇順)'
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: ページ
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      schema:
+        type: string
+      description: 1ページあたりの表示件数
+  requestBodies:
+    ProcessActionsBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              process_master_id:
+                type: integer
+                description: プロセスマスターID
+              process_action_date:
+                type: string
+                description: 実施日
+              user_id:
+                type: string
+                description: アクション対象の会員
+              action_staff_id:
+                type: integer
+                description: アクション実施者
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+      description: プロセスアクション新規作成用Body
+    ClimemoBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              memo:
+                type: string
+                description: メモの内容
+              memo_date:
+                type: string
+                description: 入力した日付
+              user_id:
+                type: string
+                description: 入力された会員のID
+              staff_if:
+                type: string
+                description: 入力したスタッフのID
+              is_mobile:
+                type: integer
+                description: モバイルアプリからの入力かどうかのフラグ
+    ClientInfoBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            description: ''
+            properties:
+              user_id:
+                type: string
+                description: 会員ID
+              staff_id:
+                type: string
+                description: 入力したスタッフのID
+              nick_name:
+                type: string
+                description: ニックネーム
+              pref:
+                type: integer
+                description: 出身都道府県コード
+              family:
+                type: string
+                description: 家族
+              birthplace:
+                type: string
+                description: 出身市町村
+              hobby:
+                type: string
+                description: 趣味
+              sports:
+                type: string
+                description: やっていたスポーツ
+              work:
+                type: string
+                description: 職業
+              is_mobile:
+                type: integer
+                description: モバイルアプリからの入力かどうかのフラグ
