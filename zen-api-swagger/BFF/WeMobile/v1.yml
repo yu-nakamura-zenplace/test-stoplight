@@ -64,6 +64,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - JWT Token: []
   '/studios/{studio_id}/comming_new_member':
     get:
       tags:
@@ -119,6 +121,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - JWT Token: []
   /process_master:
     get:
       tags:
@@ -138,6 +142,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProcessMaster'
+      security:
+        - JWT Token: []
   /process_actioins:
     get:
       tags:
@@ -203,6 +209,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - JWT Token: []
     post:
       tags:
         - process
@@ -228,6 +236,8 @@ paths:
       responses:
         '200':
           description: 削除成功
+      security:
+        - JWT Token: []
   /client_memos:
     post:
       tags:
@@ -243,6 +253,8 @@ paths:
                 $ref: '#/components/schemas/Climemo'
       requestBody:
         $ref: '#/components/requestBodies/ClimemoBody'
+      security:
+        - JWT Token: []
     parameters: []
   '/client_memos/{client_memo_id}':
     put:
@@ -261,6 +273,8 @@ paths:
                 $ref: '#/components/schemas/Climemo'
       requestBody:
         $ref: '#/components/requestBodies/ClimemoBody'
+      security:
+        - JWT Token: []
     delete:
       tags:
         - client_memo
@@ -292,6 +306,8 @@ paths:
                 $ref: '#/components/schemas/ClientInfo'
       requestBody:
         $ref: '#/components/requestBodies/ClientInfoBody'
+      security:
+        - JWT Token: []
   /member_achievements:
     get:
       tags:
@@ -313,6 +329,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MemberAchievement'
+      security:
+        - JWT Token: []
   /staffs:
     get:
       tags:
@@ -367,6 +385,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - JWT Token: []
   /studios/available:
     get:
       tags:
@@ -418,6 +438,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - JWT Token: []
     parameters: []
   '/brand/{brand_id}/studios':
     get:
@@ -471,6 +493,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - JWT Token: []
   '/studios/{studio_id}/schedules':
     get:
       tags:
@@ -526,6 +550,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - JWT Token: []
   /my/profile:
     get:
       summary: Your GET endpoint
@@ -538,6 +564,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Staff'
       operationId: get-my-profile
+      security:
+        - JWT Token: []
 components:
   schemas:
     Studio:
@@ -1006,3 +1034,8 @@ components:
               is_mobile:
                 type: integer
                 description: モバイルアプリからの入力かどうかのフラグ
+  securitySchemes:
+    JWT Token:
+      name: 'Authorized: bearer'
+      type: apiKey
+      in: header

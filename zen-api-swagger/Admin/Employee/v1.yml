@@ -63,6 +63,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - ApiKeyAuth: []
   /auth/login:
     post:
       summary: ログイン認証
@@ -221,11 +223,6 @@ paths:
           in: header
           name: 'Authorization: bearer <JWTトークン>'
           description: JWTトークン
-        - schema:
-            type: string
-          in: header
-          name: x-api-key
-          description: APIキー
       responses:
         '200':
           description: ログインしたスタッフの情報を取得
@@ -260,6 +257,8 @@ paths:
                 required:
                   - error
       operationId: get-my-profile
+      security:
+        - ApiKeyAuth: []
     parameters: []
 components:
   schemas:
@@ -392,3 +391,8 @@ components:
               password:
                 type: string
       description: user_login_id と パスワードで認証する時のリクエストBody
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key

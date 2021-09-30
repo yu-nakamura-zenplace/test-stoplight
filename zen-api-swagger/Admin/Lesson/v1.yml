@@ -64,6 +64,8 @@ paths:
               schema:
                 type: integer
               description: 最後のページ
+      security:
+        - APIKeyAuth: []
   '/reservations/counts/{reservation_count_group}':
     get:
       tags:
@@ -88,6 +90,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/ReserveNum'
           headers: {}
+      security:
+        - APIKeyAuth: []
     parameters:
       - name: reservation_count_group
         in: path
@@ -254,3 +258,9 @@ components:
           - staff
         example: member
       description: 予約件数を集計する際のグルーピング
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      in: header
+      description: ''
+      name: X-API-Key
